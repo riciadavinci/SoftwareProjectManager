@@ -1,0 +1,1 @@
+FLASK_APP=software_project_manager.py
