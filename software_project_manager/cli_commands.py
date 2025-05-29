@@ -1,9 +1,10 @@
 from software_project_manager import app
 from software_project_manager import db
 from ._app_data import DEFAULT_TASK_STATUSES
-from ._dummy_data import DUMMY_SOFTWARE_PROJECTS
+from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS
 from .models import TaskStatus
 from .models import SoftwareProject
+from .models import Task
 
 
 @app.cli.command("create_db")
@@ -18,6 +19,7 @@ def pupulate_db():
         task_status = TaskStatus(id, name)
         db.session.add(task_status)
     db.session.commit()
+    # ----------------------------------------
     # Add Dummy Software Projects:
     # Add If block to add this only during development
     for item in DUMMY_SOFTWARE_PROJECTS:
@@ -25,6 +27,16 @@ def pupulate_db():
         swpr_description = item.get("description")
         software_project = SoftwareProject(swpr_name, swpr_description)
         db.session.add(software_project)
+    db.session.commit()
+    # ----------------------------------------
+    # Add Dummy Tasks:
+    for item in DUMMY_TASKS:
+        title = item.get("name")
+        description = item.get("description")
+        task_status_id = item.get("task_status_id")
+        software_project_id = item.get("software_project_id")
+        task = Task(title, description, task_status_id, software_project_id)
+        db.session.add(task)
     db.session.commit()
 
 @app.cli.command("delete_db")
