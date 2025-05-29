@@ -8,7 +8,7 @@ class SoftwareProject(db.Model):
     desciption = db.Column(db.String(2500), nullable=True)
     created_on = db.Column(db.DateTime, default=datetime.now())
     modified_on = db.Column(db.DateTime, default=datetime.now())
-    tasks = db.relationship("Task", backref="task_id")
+    tasks = db.relationship("Task", backref="swpr_task_id")
 
     def __init__(self, name, description=None):
         self.name = name
