@@ -23,4 +23,5 @@
 - [Testing Flask Applications with pytest - Patrick Kennedy](https://www.youtube.com/watch?v=OcD52lXq0e8)
 - [Python Tutorial: Unit Testing Your Code with the unittest Module](https://www.youtube.com/watch?v=6tNS--WetLI)
 - [Getting Started With Testing in Flask](https://www.youtube.com/watch?v=RLKW7ZMJOf4)
-
+- [Flask Restful docs](https://flask-restful.readthedocs.io/en/latest/)
+- [SQLite FTS5 Extension - Full Text Search](https://www.sqlite.org/fts5.html)
