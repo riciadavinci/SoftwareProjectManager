@@ -17,11 +17,11 @@ class Task(db.Model):
         self.task_status_id = task_status_id
         self.software_project_id = software_project_id
     
-    def update(self, new_title, new_description, new_task_status_id, software_project_id):
+    def update(self, new_title, new_description, new_task_status_id, new_software_project_id):
         self.title = new_title
         self.description = new_description
         self.task_status_id = new_task_status_id
-        self.software_project_id = software_project_id
+        self.software_project_id = new_software_project_id
         self.modified_on = datetime.now()
         db.session.commit()
     
@@ -32,3 +32,15 @@ class Task(db.Model):
     
     def __repr__(self):
         return f"Task <{self.id}>"
+    
+    def to_dict(self):
+        data = {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "created_on": self.created_on,
+            "modified_on": self.modified_on,
+            "task_status_id": self.task_status_id,
+            "software_project_id": self.software_project_id
+        }
+        return data
