@@ -50,7 +50,6 @@ class SoftwareProjectResource(Resource):
         except AttributeError as ex:
                 return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found!"}), 404)
         except Exception as ex:
-            print(type(ex))
             return make_response(jsonify({"error_message": str(ex)}), 501)
     
     def delete(self, id):
@@ -96,10 +95,26 @@ api.add_resource(SoftwareProjectListResource, "/api/software-project/")
 
 class TaskResource(Resource):
     def get(self, id):
-        pass
+        data = {}
+        try:
+            task = Task.query.get(id)
+            data = task.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except AttributeError as ex:
+                return make_response(jsonify({"error_message": f"Task <{id}> not found!"}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
 
     def delete(self, id):
-        pass
+        try:
+            task = Task.query.get(id)
+            db.session.delete(task)
+            db.session.commit()            
+            return make_response(jsonify({"message": f"Deleted {task}"}))
+        except UnmappedInstanceError as ex:
+                return make_response(jsonify({"error_message": f"Task <{id}> not found! Therefore, cannot delete it."}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
 
 class TaskListResource(Resource):
     def get(self):
@@ -118,15 +133,14 @@ class TaskListResource(Resource):
             return make_response(jsonify({"error_message": str(ex)}), 501)
     
     def post(self):
-        data = []
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument("title", type=str)
-            parser.add_argument("description", type=str)
-            parser.add_argument("task_status_id", type=str)
-            parser.add_argument("software_project_id", type=int)
+            parser.add_argument("title", type=str, required=True)
+            parser.add_argument("description", type=str, required=True)
+            parser.add_argument("task_status_id", type=str, required=True)
+            parser.add_argument("software_project_id", type=int, required=True)
             args = parser.parse_args()
-            task = Task(args.title, args.description, args.task_status_id, args.software_project_id)
+            task = Task(args["title"], args["description"], args["task_status_id"], args["software_project_id"])
             db.session.add(task)
             db.session.commit()
             return make_response(jsonify({"data": task.to_dict()}), 200)
