@@ -9,7 +9,7 @@ class Task(db.Model):
     created_on = db.Column(db.DateTime, default=datetime.now())
     modified_on = db.Column(db.DateTime, default=datetime.now())
     task_status_id = db.Column(db.String(10), db.ForeignKey("task_statuses.id"))
-    software_project_id = db.Column(db.String(10), db.ForeignKey("software_projects.id"))
+    software_project_id = db.Column(db.Integer, db.ForeignKey("software_projects.id"))
 
     def __init__(self, title, description, task_status_id, software_project_id):
         self.title = title
