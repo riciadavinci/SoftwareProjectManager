@@ -13,7 +13,7 @@ DEFAULT_REFERENCE_TYPES = [
         "name": "Online Article"
     },
     {
-        "name": "Online Documentation"
+        "name": "Documentation"
     },
     {
         "name": "Book"

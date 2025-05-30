@@ -1,10 +1,11 @@
 from software_project_manager import app
 from software_project_manager import db
-from ._app_data import DEFAULT_TASK_STATUSES
+from ._app_data import DEFAULT_TASK_STATUSES, DEFAULT_REFERENCE_TYPES
 from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS
 from .models import TaskStatus
 from .models import SoftwareProject
 from .models import Task
+from .models import ProjectReferenceType
 
 
 @app.cli.command("create_db")
@@ -18,6 +19,12 @@ def pupulate_db():
     for id, name in DEFAULT_TASK_STATUSES.items():
         task_status = TaskStatus(id, name)
         db.session.add(task_status)
+    db.session.commit()
+    # ----------------------------------------
+    # Add default project reference types: Youtube Video, Research Paper, Documentation, etc
+    for reference_type in DEFAULT_REFERENCE_TYPES:
+        project_reference_type = ProjectReferenceType(reference_type.get("name"))
+        db.session.add(project_reference_type)
     db.session.commit()
     # ----------------------------------------
     # Add Dummy Software Projects:
