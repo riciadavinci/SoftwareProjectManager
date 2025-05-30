@@ -31,7 +31,7 @@ def pupulate_db():
     # ----------------------------------------
     # Add Dummy Tasks:
     for item in DUMMY_TASKS:
-        title = item.get("name")
+        title = item.get("title")
         description = item.get("description")
         task_status_id = item.get("task_status_id")
         software_project_id = item.get("software_project_id")
