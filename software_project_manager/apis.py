@@ -48,18 +48,39 @@ class SoftwareProjectResource(Resource):
             data = software_project.to_dict()
             return make_response(jsonify({"data": data}), 200)
         except AttributeError as ex:
-                return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found!"}), 404)
+            return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found!"}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+    
+    def put(self, id):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("name", type=str, required=True)
+            parser.add_argument("description", type=str, required=True)
+            args = parser.parse_args()
+            software_project = SoftwareProject.query.get(id)
+            if software_project:
+                software_project.update(args["name"], args["description"])
+            data = software_project.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except AttributeError as ex:
+            return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found!"}), 404)
+        except UnmappedInstanceError as ex:
+            return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found! Therefore, cannot update it."}), 404)
         except Exception as ex:
             return make_response(jsonify({"error_message": str(ex)}), 501)
     
     def delete(self, id):
         try:
             software_project = SoftwareProject.query.get(id)
-            db.session.delete(software_project)
-            db.session.commit()            
+            if software_project:
+                db.session.delete(software_project)
+                db.session.commit()
+                # No need to delete all Tasks, ProjectReferences, and SoftwareBugs related to this particular project, 
+                # because cascade="all, delete" in the db.relationship() will take care of all these.
             return make_response(jsonify({"message": f"Deleted {software_project}"}))
         except UnmappedInstanceError as ex:
-                return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found! Therefore, cannot delete it."}), 404)
+            return make_response(jsonify({"error_message": f"SoftwareProject <{id}> not found! Therefore, cannot delete it."}), 404)
         except Exception as ex:
             return make_response(jsonify({"error_message": str(ex)}), 501)
 
@@ -75,8 +96,8 @@ class SoftwareProjectListResource(Resource):
     def post(self):
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument("name")
-            parser.add_argument("description")
+            parser.add_argument("name", type=str, required=True)
+            parser.add_argument("description", type=str, required=True)
             args = parser.parse_args()
             software_project = SoftwareProject(args.name, args.description)
             db.session.add(software_project)
@@ -102,6 +123,24 @@ class TaskResource(Resource):
             return make_response(jsonify({"data": data}), 200)
         except AttributeError as ex:
                 return make_response(jsonify({"error_message": f"Task <{id}> not found!"}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+    
+    def put(self, id):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("title", type=str, required=True)
+            parser.add_argument("description", type=str, required=True)
+            parser.add_argument("task_status_id", type=str, required=True)
+            parser.add_argument("software_project_id", type=int, required=True)
+            args = parser.parse_args()
+            task = Task.query.get(id)
+            if task:
+                task.update(args["title"], args["description"], args["task_status_id"], args["software_project_id"])
+            data = task.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except UnmappedInstanceError as ex:
+            return make_response(jsonify({"error_message": f"Task <{id}> not found! Therefore, cannot update it."}), 404)
         except Exception as ex:
             return make_response(jsonify({"error_message": str(ex)}), 501)
 
