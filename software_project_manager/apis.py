@@ -7,6 +7,7 @@ from software_project_manager import api
 from software_project_manager.models import TaskStatus
 from software_project_manager.models import SoftwareProject
 from software_project_manager.models import Task
+from software_project_manager.models import ProjectReference
 
 
 # ----------------------------------------
@@ -189,3 +190,85 @@ class TaskListResource(Resource):
 
 api.add_resource(TaskResource, "/api/task/<int:id>")
 api.add_resource(TaskListResource, "/api/task/")
+
+# ----------------------------------------
+# 'ProjectReference' API
+# ----------------------------------------
+
+class ProjectReferenceResource(Resource):
+    def get(self, id):
+        data = {}
+        try:
+            project_ref = ProjectReference.query.get(id)
+            data = project_ref.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except AttributeError as ex:
+                return make_response(jsonify({"error_message": f"ProjectReference <{id}> not found!"}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+    def put(self, id):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("name", type=str, required=True)
+            parser.add_argument("reference_type_id", type=str, required=True)
+            parser.add_argument("software_project_id", type=int, required=True)
+            parser.add_argument("url", type=str, required=False)
+            parser.add_argument("author_name", type=str, required=False)
+            args = parser.parse_args()
+            project_ref = ProjectReference.query.get(id)
+            if project_ref:
+                project_ref.update(args["name"], args["reference_type_id"], args["software_project_id"], args["url"], args["author_name"])
+            data = project_ref.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except UnmappedInstanceError as ex:
+            return make_response(jsonify({"error_message": f"ProjectReference <{id}> not found! Therefore, cannot update it."}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+    def delete(self, id):
+        try:
+            project_ref = ProjectReference.query.get(id)
+            db.session.delete(project_ref)
+            db.session.commit()            
+            return make_response(jsonify({"message": f"Deleted ProjectReference <{id}>!"}))
+        except UnmappedInstanceError as ex:
+                return make_response(jsonify({"error_message": f"ProjectReference <{id}> not found! Therefore, cannot delete it."}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+class ProjectReferenceListResource(Resource):
+    def get(self):
+        data = []
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("swpr_id", required=False, type=int)
+            args = parser.parse_args()
+            if (args["swpr_id"]):
+                data = [pr_ref_item.to_dict() for pr_ref_item in ProjectReference.query.filter_by(software_project_id=args.swpr_id)]
+            else:
+                data = [pr_ref_item.to_dict() for pr_ref_item in ProjectReference.query.all()]
+            return make_response(jsonify({"data": data}), 200)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+    def post(self):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("name", type=str, required=True)
+            parser.add_argument("reference_type_id", type=str, required=True)
+            parser.add_argument("software_project_id", type=int, required=True)
+            parser.add_argument("url", type=str, required=False)
+            parser.add_argument("author_name", type=str, required=False)
+            args = parser.parse_args()
+            project_reference = ProjectReference(args["name"], args["reference_type_id"], args["software_project_id"], args["url"], args["author_name"])
+            db.session.add(project_reference)
+            db.session.commit()
+            return make_response(jsonify({"data": project_reference.to_dict()}), 200)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+
+api.add_resource(ProjectReferenceResource, "/api/project-reference/<int:id>")
+api.add_resource(ProjectReferenceListResource, "/api/project-reference/")
+
