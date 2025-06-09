@@ -1,4 +1,5 @@
 from software_project_manager import db
+from .DbCommons import user_projects
 from datetime import datetime
 
 class SoftwareProject(db.Model):
@@ -10,6 +11,7 @@ class SoftwareProject(db.Model):
     modified_on = db.Column(db.DateTime, default=datetime.now())
     tasks = db.relationship("Task", backref="swpr_task_id", cascade="all, delete")
     project_references = db.relationship("ProjectReference", backref="swpr_ref_id", cascade="all, delete")
+    members = db.relationship("User", secondary=user_projects, back_populates="software_projects")
 
     def __init__(self, name, description=None):
         self.name = name
@@ -23,7 +25,7 @@ class SoftwareProject(db.Model):
     
     def __repr__(self):
         return f"SoftwareProject <{self.id}>"
-
+    
     def to_dict(self):
         data = {
             "id": self.id,
