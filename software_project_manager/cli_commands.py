@@ -2,13 +2,14 @@ import click
 from software_project_manager import app
 from software_project_manager import db
 import time
-from ._app_data import DEFAULT_TASK_STATUSES, DEFAULT_REFERENCE_TYPES
+from ._app_data import DEFAULT_TASK_STATUSES, DEFAULT_REFERENCE_TYPES, DEFAULT_SOFTWARE_PROJECTS, DEFAULT_PROJECT_REFERENCES
 from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS, DUMMY_USERS
 from .models import User
 from .models import TaskStatus
 from .models import SoftwareProject
 from .models import Task
 from .models import ProjectReferenceType
+from .models import ProjectReference
 
 
 @app.cli.command("create_db")
@@ -18,6 +19,7 @@ def create_db():
 
 @app.cli.command("populate_db")
 def pupulate_db():
+    # ----------------------------------------
     # Add default task statuses: TODO, W.I.P (Work in Progress), Done
     for id, name in DEFAULT_TASK_STATUSES.items():
         task_status = TaskStatus(id, name)
@@ -29,6 +31,28 @@ def pupulate_db():
         project_reference_type = ProjectReferenceType(reference_type.get("name"))
         db.session.add(project_reference_type)
     db.session.commit()
+    # ----------------------------------------
+    # Add default projects: just the project itself atm ("Software Project Manager"):
+    for project_item in DEFAULT_SOFTWARE_PROJECTS:
+        name = project_item.get("name")
+        description = project_item.get("description")
+        sw_project = SoftwareProject(name, description)
+        db.session.add(sw_project)
+    db.session.commit()
+    # ----------------------------------------
+    # Add default project references (for "Software Project Manager"):
+    for project_ref_item in DEFAULT_PROJECT_REFERENCES:
+        name = project_ref_item.get("name")
+        reference_type_id = project_ref_item.get("reference_type_id")
+        software_project_id = project_ref_item.get("software_project_id")
+        url = project_ref_item.get("url")
+        author = project_ref_item.get("author")
+        project_reference = ProjectReference(name, reference_type_id, software_project_id, url, author)
+        db.session.add(project_reference)
+    db.session.commit()
+
+@app.cli.command("insert_dummy_data")
+def insert_dummy_data():
     # ----------------------------------------
     # Adding dummy users:
     for item in DUMMY_USERS:
