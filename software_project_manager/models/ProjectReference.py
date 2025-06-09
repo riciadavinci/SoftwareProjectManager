@@ -6,7 +6,7 @@ class ProjectReference(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(500), nullable=False)
     url = db.Column(db.String(500), nullable=True)
-    author_name = db.Column(db.String(250), nullable=False)
+    author_name = db.Column(db.String(250), nullable=True)
     created_on = db.Column(db.DateTime, default=datetime.now())
     modified_on = db.Column(db.DateTime, default=datetime.now())
     reference_type_id = db.Column(db.Integer, db.ForeignKey("project_reference_types.id"))
@@ -25,6 +25,7 @@ class ProjectReference(db.Model):
         self.software_project_id = new_software_project_id
         self.url = new_url
         self.author_name = new_author_name
+        self.modified_on = datetime.now()
         db.session.commit()
     
     def __repr__(self):
@@ -38,7 +39,7 @@ class ProjectReference(db.Model):
             "author_name": self.author_name,
             "created_on": self.created_on,
             "modified_on": self.modified_on,
-            "task_status_id": self.reference_type_id,
+            "reference_type_id": self.reference_type_id,
             "software_project_id": self.software_project_id
         }
         return data
