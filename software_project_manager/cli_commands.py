@@ -1,7 +1,10 @@
+import click
 from software_project_manager import app
 from software_project_manager import db
+import time
 from ._app_data import DEFAULT_TASK_STATUSES, DEFAULT_REFERENCE_TYPES
-from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS
+from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS, DUMMY_USERS
+from .models import User
 from .models import TaskStatus
 from .models import SoftwareProject
 from .models import Task
@@ -27,6 +30,18 @@ def pupulate_db():
         db.session.add(project_reference_type)
     db.session.commit()
     # ----------------------------------------
+    # Adding dummy users:
+    for item in DUMMY_USERS:
+        name = item.get("name")
+        email_id = item.get("email_id")
+        password = item.get("password")
+        is_developer = item.get("is_developer")
+        is_product_manager = item.get("is_product_manager")
+        user = User(email_id, name, password, is_developer, is_product_manager)
+        db.session.add(user)
+        print(user)
+    db.session.commit()
+    # ----------------------------------------
     # Add Dummy Software Projects:
     # Add If block to add this only during development
     for item in DUMMY_SOFTWARE_PROJECTS:
@@ -45,6 +60,18 @@ def pupulate_db():
         task = Task(title, description, task_status_id, software_project_id)
         db.session.add(task)
     db.session.commit()
+
+@app.cli.command("add_admin")
+@click.argument("email")
+@click.argument("name")
+@click.argument("password")
+def add_admin(email, name, password):
+    # ----------------------------------------
+    # Add Admin User:
+    admin_user = User(email, name, password, True, True, True)
+    db.session.add(admin_user)
+    db.session.commit()
+    print(admin_user)
 
 @app.cli.command("delete_db")
 def delete_db():
