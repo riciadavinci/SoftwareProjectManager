@@ -1,7 +1,5 @@
-# from software_project_manager import db
 
-# from .SoftwareProject import SoftwareProject
-
+from .User import User
 from .SoftwareProject import SoftwareProject
 from .TaskStatus import TaskStatus
 from .Task import Task
