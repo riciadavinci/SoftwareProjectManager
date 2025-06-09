@@ -1,5 +1,23 @@
 
 
+DUMMY_USERS = [
+    {
+        "name": "Max Mustermann",
+        "email_id": "max.mustermann@gmail.com",
+        "password": "password",
+        "is_developer": False,
+        "is_product_manager": True
+    },
+        {
+        "name": "John Doe",
+        "email_id": "john.doe@gmail.com",
+        "password": "password",
+        "is_developer": True,
+        "is_product_manager": False
+    }
+]
+
+
 DUMMY_SOFTWARE_PROJECTS = [
     {
         "name": "Test Project 1",
