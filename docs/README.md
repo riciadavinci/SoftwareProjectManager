@@ -16,6 +16,21 @@
     - [ ] Append list of online resources used as reference
     - [ ] Export the report to Markdown for Github
 
+- TODO: Full JWT based login (authentication), and role based authorization
+- TODO: Add two more buckets to Tasks:
+    - Backlog: Default bucket when a task is created. Only visible to product/project manager
+    - Won't/Can't Do: Feature can't be implemented / dev is not going to do it. Maybe split it into 2 - wont do & can't do? Or do we need won't do? The PM can just reassign it
+    - Add labels/tags to tasks: Feature, Bug Resolution, Documentation, Test, etc. (Both dev & pm can create & add them)
+    - Do I need Code Review & QA buckets?? If yes, they will come in-between WIP and Done
+- TODO: Task Edit/View page
+    - developer: 
+        - Append description? Change status✓ (TODO->WIP->Done or TODO->Can't Do), Overlay in kanban board + separate task page
+        - Only dev has Kanban board view: 3 buckets - TODO, WIP, Done
+    - pm: 
+        - Full CRUD Rights, except task status change: when task is created, it is added to backlog by default. 
+        - When a task is assigned, it automatically changes status to TODO.
+        - Only pm has Dashboard to track progress of a particular project: url/dashboard/<project_id>
+    - add commments (only add) to a task: both pm and dev can make them
 
 ### Helpful Resources:
 - pytest Basics: [🔗Youtube Playlist](https://www.youtube.com/playlist?list=PLxNPSjHT5qvuZ_JT1bknzrS8YqLiMjNpS)
