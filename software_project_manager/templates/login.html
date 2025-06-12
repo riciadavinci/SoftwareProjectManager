@@ -1,7 +1,24 @@
 {% extends 'layout.html' %}
 
+{% import "bootstrap/wtf.html" as wtf %}
 
 {% block body %}
-<h3>Login Page</h3>
+<div class="container custom-login-form">
+    <form class="form-signin" method="POST" action="/login" autocomplete="off">
+        <h3 class="form-signin-heading text-center">Please sign in</h3>
+        {{ form.hidden_tag() }}
 
+            {{ wtf.form_field(form.email_id) }}
+
+            {{ wtf.form_field(form.password) }}
+
+        <div class="checkbox mb-3">
+            {{ wtf.form_field(form.remember) }}
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    </form>
+    <div class="text-center" style="margin-top: 1.5rem; padding: 0.25rem;">
+        <a href="{{ url_for('login_page') }}">Forgot Password?</a>
+    </div>
+</div>
 {% endblock %}
