@@ -1,7 +1,7 @@
 import click
 from software_project_manager import app
 from software_project_manager import db
-import time
+from werkzeug.security import generate_password_hash
 from ._app_data import DEFAULT_TASK_STATUSES, DEFAULT_REFERENCE_TYPES, DEFAULT_SOFTWARE_PROJECTS, DEFAULT_PROJECT_REFERENCES
 from ._dummy_data import DUMMY_SOFTWARE_PROJECTS, DUMMY_TASKS, DUMMY_USERS
 from .models import User
@@ -61,7 +61,8 @@ def insert_dummy_data():
         password = item.get("password")
         is_developer = item.get("is_developer")
         is_product_manager = item.get("is_product_manager")
-        user = User(email_id, name, password, is_developer, is_product_manager)
+        password_hash = generate_password_hash(password, method="scrypt")
+        user = User(email_id, name, password_hash, is_developer, is_product_manager)
         db.session.add(user)
         print(user)
     db.session.commit()
@@ -92,7 +93,8 @@ def insert_dummy_data():
 def add_admin(email, name, password):
     # ----------------------------------------
     # Add Admin User:
-    admin_user = User(email, name, password, True, True, True)
+    password_hash = generate_password_hash(password, method="scrypt")
+    admin_user = User(email, name, password_hash, True, True, True)
     db.session.add(admin_user)
     db.session.commit()
     print(admin_user)
