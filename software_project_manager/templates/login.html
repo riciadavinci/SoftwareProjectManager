@@ -4,25 +4,27 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login_page.css') }}">
 {% endblock %}
 
-{% import "bootstrap/wtf.html" as wtf %}
-
 {% block body %}
 <div class="container custom-login-form">
     <form class="form-signin" method="POST" action="/login" autocomplete="off">
         <h3 class="form-signin-heading text-center">Please sign in</h3>
-        {{ form.hidden_tag() }}
-
-            {{ wtf.form_field(form.email_id) }}
-
-            {{ wtf.form_field(form.password) }}
-
-        <div class="checkbox mb-3">
-            {{ wtf.form_field(form.remember) }}
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" class="form-control" aria-describedby="emailHelp" id="email-field">
+            <!-- <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
         </div>
-        <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password-field">
+        </div>
+        <button class="btn btn-primary btn-block" type="button" id="sign-in-btn">Sign in</button>
     </form>
     <div class="text-center" style="margin-top: 1.5rem; padding: 0.25rem;">
-        <a href="{{ url_for('login_page') }}">Forgot Password?</a>
+        <a href="#">Forgot Password?</a>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/login_page.js') }}"></script>
 {% endblock %}
