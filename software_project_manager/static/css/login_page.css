@@ -1,0 +1,9 @@
+.custom-login-form {
+    background-color: #D5D8DC;
+    max-width: 25rem;
+    padding: 2.5rem;
+    margin-top: 2.5rem;
+    margin-bottom: 2.5rem;
+    border-radius: 1.5rem;
+    box-shadow: 7.5px 7.5px #444444cc;
+}
