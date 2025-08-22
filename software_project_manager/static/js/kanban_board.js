@@ -127,18 +127,18 @@ function enableDragAndDrop() {
             // Notify backend
             const newStatus = col.dataset.status;
             const card_id = cardId.split("-")[1];
-            await updateTaskStatus(card_id);
+            await updateTaskStatus(card_id, newStatus);
             resortColumn(col); 
         });
     });
 }
 
-async function updateTaskStatus(card_id) {
+async function updateTaskStatus(card_id, new_status) {
     try {
         const response = await fetch(`/api/task/${card_id}/status`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ task_status_id: newStatus })
+            body: JSON.stringify({ task_status_id: new_status })
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
     } catch (err) {
