@@ -3,11 +3,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from software_project_manager import app
 from .models import User
 from .forms import LoginForm
+from .app_wrappers import jwt_view_required
 
 
 @app.route("/home")
 @app.route("/index")
 @app.route("/")
+@jwt_view_required
 def home_page():
     return redirect(url_for("login_page"))
 
@@ -22,3 +24,9 @@ def view_robots_txt_file():
         return send_from_directory("static", "misc/robots.txt")
     except:
         return "<h1>404, Not found!</h1>"
+
+@app.route("/kanban-board")
+@jwt_view_required
+def view_kanban_board():
+    
+    return render_template("kanban_Board.html")
