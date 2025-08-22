@@ -1,17 +1,20 @@
-const swpr_id = null;  // optional filter
-const user_id = null;  // optional filter
 
-const queryParams = new URLSearchParams({
-    swpr_id: swpr_id !== null ? swpr_id : "",
-    user_id: user_id !== null ? user_id : ""
-});
 
 async function loadTasks() {
+    const swpr_id = null;  // optional filter
+    const user_id = null;  // optional filter
+
+    const queryParams = new URLSearchParams({
+        swpr_id: swpr_id !== null ? swpr_id : "",
+        user_id: user_id !== null ? user_id : ""
+    });
+    
     try {
-        const response = await fetch(`/api/task?${queryParams.toString()}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        });
+        // const response = await fetch(`/api/task?${queryParams.toString()}`, {
+        //     method: "GET",
+        //     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${localStorage.getItem("spm_access_token")}` }
+        // });
+        const response = await fetchWithAuth(`/api/task?${queryParams.toString()}`);
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -135,11 +138,14 @@ function enableDragAndDrop() {
 
 async function updateTaskStatus(card_id, new_status) {
     try {
-        const response = await fetch(`/api/task/${card_id}/status`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ task_status_id: new_status })
-        });
+        // const access_token = localStorage.getItem("spm_access_token");
+        // const response = await fetch(`/api/task/${card_id}/status`, {
+        //     method: "PATCH",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ task_status_id: new_status }),
+        //     credentials: "include"
+        // });
+        const response = await fetchWithAuth(`/api/task/${card_id}/status`, "PATCH", {headers : {"Content-Type": "application/json"}}, {"task_status_id": new_status});
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
     } catch (err) {
         console.error("Failed to update task status:", err);
