@@ -44,3 +44,4 @@
 - User Authentication in Flask App using JWT [ JSON Web Token ]: [🔗Youtube Video](https://www.youtube.com/watch?v=_3NKBHYcpyg)
 - JWT Authentication for Flask - _Ssali Jonathan_: [🔗Youtube Playlist](https://www.youtube.com/playlist?list=PLEt8Tae2spYmugodsDflw5U8zp1yzSPgU)
 - Basic Relationship Patterns - SQLAlchemy [Online Documentation](https://docs.sqlalchemy.org/en/13/orm/basic_relationships.html)
+- flask-jwt-authentication @demoskp: [🔗flask-jwt-authentication Demo - Github](https://github.com/demoskp/flask-jwt-authentication)
