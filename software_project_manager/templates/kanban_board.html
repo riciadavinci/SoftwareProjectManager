@@ -1,0 +1,44 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/kanban_board.css')}}">
+{% endblock %}
+
+
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block body %}
+
+<div class="container-fluid mt-4">
+    <div class="row g-3">
+        <!-- TODO Column -->
+        <div class="col-md-4">
+            <div class="kanban-column" id="todo-column" data-status="todo">
+                <div class="kanban-column-header bg-primary text-white p-2 rounded">TODO</div>
+                <!-- Tasks will be appended here -->
+            </div>
+        </div>
+
+        <!-- WIP Column -->
+        <div class="col-md-4">
+            <div class="kanban-column" id="wip-column" data-status="wip">
+                <div class="kanban-column-header bg-warning text-dark p-2 rounded">WIP</div>
+                <!-- Tasks will be appended here -->
+            </div>
+        </div>
+
+        <!-- Done Column -->
+        <div class="col-md-4">
+            <div class="kanban-column" id="done-column" data-status="done">
+                <div class="kanban-column-header bg-success text-white p-2 rounded">Done</div>
+                <!-- Tasks will be appended here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/kanban_board.js')}}"></script>
+{% endblock %}
