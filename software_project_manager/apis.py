@@ -1,6 +1,9 @@
 from flask_restful import Resource, reqparse
 from flask import jsonify, make_response, request
 from sqlalchemy.orm.exc import UnmappedInstanceError
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from datetime import timedelta
 
 from software_project_manager import db
 from software_project_manager import api
@@ -8,6 +11,56 @@ from software_project_manager.models import TaskStatus
 from software_project_manager.models import SoftwareProject
 from software_project_manager.models import Task
 from software_project_manager.models import ProjectReference
+from software_project_manager.models import User
+
+
+def nullable_int(value):
+    if value in (None, ""):
+        return None
+    return int(value)
+
+# ----------------------------------------
+# 'Login/Logout/Refresh' API
+# ----------------------------------------
+
+class LoginResource(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument("email_id", type=str, required=True)
+        parser.add_argument("password", type=str, required=True)
+        args = parser.parse_args()
+        email_id = args.get("email_id")
+        password = args.get("password")
+        user = User.query.filter_by(email_id=email_id).first()
+        if not user:
+            return make_response(jsonify({"error": "Invalid Email-id"}), 401)
+        if check_password_hash(user.password, password):
+            access_token = create_access_token(identity=user.id, expires_delta=timedelta(minutes=15))
+            refresh_token = create_refresh_token(identity=user.id, expires_delta=timedelta(days=15))
+            resp = make_response(jsonify({"access_token": access_token, "refresh_token": refresh_token}), 200)
+            resp.set_cookie("access_token_cookie", access_token, httponly=True, samesite='Lax')
+            resp.set_cookie("refresh_token_cookie", refresh_token, httponly=True, samesite='Lax')
+            return resp
+
+class LogoutResource(Resource):
+    def post(self):
+        resp = make_response(jsonify({"message": "logged out"}), 201)
+        resp.delete_cookie("access_token_cookie")
+        resp.delete_cookie("refresh_token_cookie")
+        return resp
+
+class RefreshTokenResource(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        user = get_jwt_identity()
+        access_token = create_access_token(identity=user, expires_delta=timedelta(minutes=15))
+        resp = make_response(jsonify({"access_token": access_token}), 201)
+        resp.set_cookie("access_token_cookie", access_token, httponly=True, samesite='Lax')
+        return resp
+
+api.add_resource(LoginResource, "/api/login")
+api.add_resource(LogoutResource, "/api/logout")
+api.add_resource(RefreshTokenResource, "/api/refresh-token")
 
 
 # ----------------------------------------
@@ -157,15 +210,19 @@ class TaskResource(Resource):
             return make_response(jsonify({"error_message": str(ex)}), 501)
 
 class TaskListResource(Resource):
+    @jwt_required()
     def get(self):
         data = []
         try:
             parser = reqparse.RequestParser()
-            parser.add_argument("swpr_id", required=False, type=int)
-            parser.add_argument("user_id", required=False, type=int)
+            parser.add_argument("swpr_id", required=False, type=nullable_int, location="args")
+            parser.add_argument("user_id", required=False, type=nullable_int, location="args")
             args = parser.parse_args()
-            if (args["swpr_id"]):
-                data = [task_item.to_dict() for task_item in Task.query.filter_by(software_project_id=args.swpr_id)]
+            swpr_id = args.get("swpr_id")
+            user_id = args.get("user_id")
+            if (swpr_id):
+                swpr_id = int(swpr_id)
+                data = [task_item.to_dict() for task_item in Task.query.filter_by(software_project_id=swpr_id)]
             else:
                 data = [task_item.to_dict() for task_item in Task.query.all()]
             return make_response(jsonify({"data": data}), 200)
@@ -189,7 +246,28 @@ class TaskListResource(Resource):
 
 
 api.add_resource(TaskResource, "/api/task/<int:id>")
-api.add_resource(TaskListResource, "/api/task/")
+api.add_resource(TaskListResource, "/api/task")
+
+
+class TaskStatusUpdateResource(Resource):
+    @jwt_required()
+    def patch(self, id):
+        try:
+            parser = reqparse.RequestParser()
+            parser.add_argument("task_status_id", type=str, required=True)
+            args = parser.parse_args()
+            task = Task.query.get(id)
+            if task:
+                new_status = args.get("task_status_id")
+                task.update_task_status(new_status)
+            data = task.to_dict()
+            return make_response(jsonify({"data": data}), 200)
+        except UnmappedInstanceError as ex:
+            return make_response(jsonify({"error_message": f"Task <{id}> not found! Therefore, cannot update its Status."}), 404)
+        except Exception as ex:
+            return make_response(jsonify({"error_message": str(ex)}), 501)
+
+api.add_resource(TaskStatusUpdateResource, "/api/task/<int:id>/status")
 
 # ----------------------------------------
 # 'ProjectReference' API
@@ -271,4 +349,9 @@ class ProjectReferenceListResource(Resource):
 
 api.add_resource(ProjectReferenceResource, "/api/project-reference/<int:id>")
 api.add_resource(ProjectReferenceListResource, "/api/project-reference/")
+
+
+# ----------------------------------------
+# 'ProjectReferenceType' API
+# ----------------------------------------
 
